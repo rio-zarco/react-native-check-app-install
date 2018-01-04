@@ -39,11 +39,41 @@ class AppInstalledChecker {
     }
 
     static isAppInstalledAndroid(key) {
-        return this.checkPackageName(APP_LIST[key].pkgName);
+        return this.checkPackageName(key);
     }
 
     static isAppInstalledIOS(key) {
         return this.checkURLScheme(APP_LIST[key].urlScheme, APP_LIST[key].urlParams);
+    }
+
+
+    static openApp(key) {
+        if (Platform.OS == 'ios') {
+            Linking.openURL(key + '://').catch(err => console.log(err))
+        } else {
+            CheckPackageInstallation.openApp(key)
+        }
+    }
+
+    static openAppInStore(link) {
+        if (Platform.OS == 'ios') {
+            let url = 'itms-apps://' + link;
+            Linking
+                .canOpenURL(url)
+                .then((isInstalled) => {
+                    if (isInstalled) {
+                        Linking.openURL(url).catch(err => console.log(err))
+                    }else
+                    {
+                        Linking.openURL('http://' + link).catch(err => console.log(err))
+                    }
+                })
+                .catch((err) => {
+                    Linking.openURL('http://' + link).catch(err => console.log(err))
+                });
+        } else {
+            CheckPackageInstallation.openAppInStore(link)
+        }
     }
 }
 
